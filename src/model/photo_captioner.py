@@ -25,7 +25,7 @@ class PhotoCaptioner(nn.Module):
             p.requires_grad = False
 
         self.projection = nn.Linear(2048, 512)
-        self.embed = nn.Embedding(vocab_size, 512, padding_idx=0)
+        self.embed = nn.Embedding(vocab_size, 512, padding_idx=pad_idx)
 
         self.decoder = nn.LSTM(input_size=512, hidden_size=512, num_layers=2, batch_first=True, dropout=0.2)
         self.fc_out = nn.Linear(512, vocab_size)

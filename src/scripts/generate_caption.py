@@ -2,7 +2,7 @@ import argparse
 import torch
 from PIL import Image
 import torchvision.transforms as T
-from src.training.train import PhotoCaptioner
+from src.model.photo_captioner import PhotoCaptioner
 from src.utils.text import build_vocab_from_csv 
 from torchvision import models
 import torch.nn as nn
@@ -107,26 +107,34 @@ def generate_caption_beam(
     image,
     vocab,
     beam_size=5,
-    max_len=30,
-    length_penalty=0.7,
-    repetition_penalty=1.15,
-    no_repeat_ngram_size=3,
+    max_len=20,
+    length_penalty=0.9,
+    repetition_penalty=1.25,
+    no_repeat_ngram_size=2,
 ):
     device = next(model.parameters()).device
+    image = image.to(device)
 
     # Encode image once
     feature = model.encoder(image)
     feature = torch.flatten(feature, 1)          # [1, 2048]
     projected = model.projection(feature)        # [1, 512]
+    projected_step = projected.unsqueeze(1)      # [1, 1, 512]
 
     sos = vocab.word2idx["<SOS>"]
     eos = vocab.word2idx["<EOS>"]
     pad = vocab.word2idx.get("<PAD>", None)
     unk = vocab.word2idx.get("<UNK>", None)
 
-    # beams: (token_ids_list, hidden_state, score_logprob)
-    beams = [([sos], None, 0.0)]
+    projected_step = projected.unsqueeze(1)  # [1,1,512]
+    _, initial_hidden = model.decoder(projected_step)
+
+    beams = [([sos], initial_hidden, 0.0)]
     finished = []
+
+    def score_with_lp(token_ids, logprob):
+        L = max(1, len(token_ids))
+        return logprob / (L ** length_penalty)
 
     for _ in range(max_len):
         candidates = []
@@ -136,12 +144,16 @@ def generate_caption_beam(
                 finished.append((tokens, score))
                 continue
 
+            # Emergency brake: if last 3 tokens same, stop expanding
+            if len(tokens) >= 4 and tokens[-1] == tokens[-2] == tokens[-3]:
+                continue
+
+            # Step using last token (this updates hidden based on history)
             prev_token = torch.tensor([[tokens[-1]]], device=device)  # [1,1]
             emb = model.embed(prev_token)                             # [1,1,512]
-            projected_step = projected.unsqueeze(1)                   # [1,1,512]
             x = torch.cat([projected_step, emb], dim=1)               # [1,2,512]
 
-            outputs, next_hidden = model.decoder(x, hidden)
+            outputs, hidden_after = model.decoder(x, hidden)
             logits = model.fc_out(outputs[:, -1, :]).squeeze(0)       # [vocab]
 
             # Ban specials
@@ -150,40 +162,50 @@ def generate_caption_beam(
             if unk is not None:
                 logits[unk] = -1e9
 
-            # Anti-repeat
+            # Anti-repeat based on current partial sequence
             logits = apply_repetition_penalty(logits, tokens, penalty=repetition_penalty)
             logits = ban_repeat_ngrams(logits, tokens, no_repeat_ngram_size=no_repeat_ngram_size)
 
             log_probs = F.log_softmax(logits, dim=-1)
             topk = torch.topk(log_probs, k=beam_size)
 
+            # For each token choice, create a NEW hidden by advancing one more step
             for i in range(beam_size):
                 next_id = int(topk.indices[i].item())
                 next_score = float(topk.values[i].item())
-                candidates.append((tokens + [next_id], next_hidden, score + next_score))
+
+                new_tokens = tokens + [next_id]
+                new_score = score + next_score
+
+                # If EOS, we can keep hidden as-is; we won't expand it further
+                if next_id == eos:
+                    candidates.append((new_tokens, hidden_after, new_score))
+                    continue
+
+                # Advance hidden with the chosen next token (unique per branch)
+                next_token_tensor = torch.tensor([[next_id]], device=device)  # [1,1]
+                next_emb = model.embed(next_token_tensor)                     # [1,1,512]
+                x2 = torch.cat([projected_step, next_emb], dim=1)             # [1,2,512]
+                _, new_hidden = model.decoder(x2, hidden_after)
+
+                candidates.append((new_tokens, new_hidden, new_score))
 
         if not candidates:
             break
 
-        # Rank by length-penalized score
-        def rank(item):
-            toks, hid, sc = item
-            L = max(1, len(toks))
-            return sc / (L ** length_penalty)
-
-        candidates.sort(key=rank, reverse=True)
+        # Keep top beams
+        candidates.sort(key=lambda item: score_with_lp(item[0], item[2]), reverse=True)
         beams = candidates[:beam_size]
 
-        # Optional: stop early if we already have enough finished captions
         if len(finished) >= beam_size:
             break
 
-    # Pick best finished (or best beam)
+    # Choose best completed if exists
     if finished:
-        finished.sort(key=lambda x: x[1] / (max(1, len(x[0])) ** length_penalty), reverse=True)
+        finished.sort(key=lambda x: score_with_lp(x[0], x[1]), reverse=True)
         best_tokens = finished[0][0]
     else:
-        beams.sort(key=lambda x: x[2] / (max(1, len(x[0])) ** length_penalty), reverse=True)
+        beams.sort(key=lambda x: score_with_lp(x[0], x[2]), reverse=True)
         best_tokens = beams[0][0]
 
     # Convert to words
@@ -204,8 +226,8 @@ def generate_caption_greedy(
     model,
     image,
     vocab,
-    max_len=30,
-    repetition_penalty=1.2,
+    max_len=20,
+    repetition_penalty=1.25,
     no_repeat_ngram_size=3,
 ):
     device = next(model.parameters()).device
@@ -222,14 +244,13 @@ def generate_caption_greedy(
 
     generated = [sos_idx]
     prev_token = torch.tensor([[sos_idx]], device=device)  # [1,1]
-    hidden = None
+    projected_step = projected.unsqueeze(1)                # [1,1,512]
+    _, hidden = model.decoder(projected_step)
 
     for _ in range(max_len):
         emb = model.embed(prev_token)                 # [1,1,512]
-        projected_step = projected.unsqueeze(1)       # [1,1,512]
-        x = torch.cat([projected_step, emb], dim=1)   # [1,2,512]
 
-        outputs, hidden = model.decoder(x, hidden)
+        outputs, hidden = model.decoder(emb, hidden)
         logits = model.fc_out(outputs[:, -1, :]).squeeze(0)  # [vocab]
 
         # Optional: ban special tokens
@@ -280,7 +301,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", type=str, required=True, help="Path to image")
     parser.add_argument("--ckpt", type=str, default="best.pt", help="Path to model checkpoint")
-    parser.add_argument("--captions_csv", type=str, required=True, help="CSV used to build vocab")
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--captions_csv", type=str, help="CSV used to build vocab (training-time)")
+    group.add_argument("--vocab_pkl", type=str, help="Pickle file with saved vocab (recommended)")
     args = parser.parse_args()
 
     vocab = load_vocab("vocab.pkl")

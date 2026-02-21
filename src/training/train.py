@@ -125,6 +125,8 @@ def main():
     Creates the device, builds dataloaders, constructs a ResNet-based encoder,
     initializes the PhotoCaptioner model, and trains for a fixed number of epochs.
     """
+    MODEL = "best_v5_finetune.pt"
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--finetune", action="store_true")
     parser.add_argument("--resume_ckpt", type=str, default=None)
@@ -135,7 +137,7 @@ def main():
 
     train_loader, test_loader, val_loader, vocab = get_dataloaders(batch_size=64, num_workers=4)
     vocab_size = len(vocab.word2idx)
-    num_epoch = 10
+    num_epoch = 5
     base_lr = 1e-5
     pad_idx = vocab.word2idx["<PAD>"]
 
@@ -197,7 +199,7 @@ def main():
 
         if val_loss < best_val:
             best_val = val_loss
-            torch.save(model.state_dict(), "best_v4_finetune.pt")
+            torch.save(model.state_dict(), MODEL)
 
     metrics = pd.DataFrame({
         "epoch": list(range(1, num_epoch + 1)),
@@ -231,7 +233,7 @@ def main():
     plt.savefig("acc_curve.png", dpi=200)
     plt.show()
 
-    model.load_state_dict(torch.load("best_v4_finetune.pt", map_location=device))
+    model.load_state_dict(torch.load(MODEL, map_location=device))
     print("Model loaded")
     test_loss, test_acc = evaluate(model, test_loader, device)
     print(f"Test Loss: {test_loss:.4f} | Token acc: {test_acc:.2f}%")
