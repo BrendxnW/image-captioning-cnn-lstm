@@ -64,7 +64,17 @@ def get_dataloaders(batch_size=64, num_workers=2):
         threshold (int):
     """
 
-    transform = transforms.Compose([
+    train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
+        transforms.RandomRotation(5),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225])
+    ])
+
+    eval_transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -75,42 +85,42 @@ def get_dataloaders(batch_size=64, num_workers=2):
         csv_file="data/flickr8k/Train/train.csv",
         root_dir="data/flickr8k/Images/Images/",
         vocab=vocab,
-        transform=transform
+        transform=train_transform
     )
 
     test_data_8k = FlickrDataset(
         csv_file="data/flickr8k/Test/test.csv",
         root_dir="data/flickr8k/Images/Images/",
         vocab=vocab,
-        transform=transform
+        transform=eval_transform
     )
 
     val_data_8k = FlickrDataset(
         csv_file="data/flickr8k/Validate/validate.csv",
         root_dir="data/flickr8k/Images/Images/",
         vocab=vocab,
-        transform=transform
+        transform=eval_transform
     )
 
     training_data_30k = FlickrDataset(
         csv_file="data/flickr30k/Train/train.csv",
         root_dir="data/flickr30k/Images/",
         vocab=vocab,
-        transform=transform
+        transform=train_transform
     )
 
     test_data_30k = FlickrDataset(
         csv_file="data/flickr30k/Test/test.csv",
         root_dir="data/flickr30k/Images/",
         vocab=vocab,
-        transform=transform
+        transform=eval_transform
     )
 
     val_data_30k = FlickrDataset(
         csv_file="data/flickr30k/Validate/validate.csv",
         root_dir="data/flickr30k/Images/",
         vocab=vocab,
-        transform=transform
+        transform=eval_transform
     )
 
     train_ds = ConcatDataset([training_data_8k, training_data_30k])

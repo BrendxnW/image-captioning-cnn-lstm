@@ -71,7 +71,7 @@ def ban_repeat_ngrams(logits, generated_ids, no_repeat_ngram_size=3):
     return logits
 
 @torch.no_grad()
-def generate_caption(model, image, vocab, decode="beam",beam_size=5, max_len=MAX_LEN):
+def generate_caption(model, image, vocab, decode="beam",beam_size=3, max_len=MAX_LEN):
     """
     
     """
@@ -106,11 +106,11 @@ def generate_caption_beam(
     model,
     image,
     vocab,
-    beam_size=5,
+    beam_size=3,
     max_len=20,
     length_penalty=0.9,
     repetition_penalty=1.25,
-    no_repeat_ngram_size=2,
+    no_repeat_ngram_size=3,
 ):
     device = next(model.parameters()).device
     image = image.to(device)
@@ -316,9 +316,9 @@ def main():
 
     image = load_image(args.image)
 
-    caption = generate_caption(model, image, vocab, decode="beam", beam_size=5, max_len=MAX_LEN)
+    caption = generate_caption(model, image, vocab, decode=None, beam_size=3, max_len=MAX_LEN)
     print("Greedy:", generate_caption(model, image, vocab, decode="greedy"))
-    print("Beam:", generate_caption(model, image, vocab, decode="beam", beam_size=5))
+    print("Beam:", generate_caption(model, image, vocab, decode="beam", beam_size=3))
     print("\nImage:", args.image)
     print("Caption:", caption)
 
