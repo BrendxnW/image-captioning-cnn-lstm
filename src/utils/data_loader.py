@@ -123,8 +123,22 @@ def get_dataloaders(batch_size=64, num_workers=2):
         transform=eval_transform
     )
 
-    train_ds = ConcatDataset([training_data_8k, training_data_30k])
-    val_ds = ConcatDataset([val_data_8k, val_data_30k])
+    training_data_coco = FlickrDataset(
+        csv_file="data/COCO/Train/coco_train.csv",
+        root_dir="data/COCO/Train/train2014/",
+        vocab=vocab,
+        transform=train_transform
+    )
+
+    val_data_coco = FlickrDataset(
+        csv_file="data/COCO/Val/coco_val.csv",
+        root_dir="data/COCO/Val/val2017/",
+        vocab=vocab,
+        transform=eval_transform
+    )
+
+    train_ds = ConcatDataset([training_data_8k, training_data_30k, training_data_coco])
+    val_ds = ConcatDataset([val_data_8k, val_data_30k, val_data_coco])
     test_ds = ConcatDataset([test_data_8k, test_data_30k])
 
     train_loader = torch.utils.data.DataLoader(

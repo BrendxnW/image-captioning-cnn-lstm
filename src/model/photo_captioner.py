@@ -43,11 +43,11 @@ class PhotoCaptioner(nn.Module):
             Tensor: Logits over the vocabulary for each timestep.
         """
         with torch.no_grad():
-            feature = self.encoder(images)    
-            feature = torch.flatten(feature, 1)    
+            feature = self.encoder(images)
+            feature = torch.flatten(feature, 1)
 
-        projected_feats = self.projection(feature) 
-        caption_embed = self.embed(captions_in) 
+        projected_feats = self.projection(feature)
+        caption_embed = self.embed(captions_in)
 
         projected_feats = projected_feats.unsqueeze(1)
         x = torch.cat([projected_feats, caption_embed], dim=1)
@@ -55,4 +55,4 @@ class PhotoCaptioner(nn.Module):
         outputs, _ = self.decoder(x)
         logits = self.fc_out(outputs)
 
-        return logits    
+        return logits
