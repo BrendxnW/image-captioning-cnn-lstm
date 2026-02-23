@@ -79,10 +79,10 @@ def build_vocab_from_csv(csv_path, threshold=2):
 
     return Vocabulary(all_tokens, threshold=threshold)
 
-def save_vocab(vocab, path="vocab.pkl"):
+def save_vocab(vocab, path="vocab_2.pkl"):
     with open(path, "wb") as f:
         pickle.dump(vocab, f)
 
-def load_vocab(path="vocab.pkl"):
+def load_vocab(path="vocab_2.pkl"):
     with open(path, "rb") as f:
         return pickle.load(f)

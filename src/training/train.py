@@ -125,7 +125,7 @@ def main():
     Creates the device, builds dataloaders, constructs a ResNet-based encoder,
     initializes the PhotoCaptioner model, and trains for a fixed number of epochs.
     """
-    MODEL = "best_v6_finetune.pt"
+    MODEL = "best_v7_retrain.pt"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--finetune", action="store_true")
@@ -137,7 +137,7 @@ def main():
 
     train_loader, test_loader, val_loader, vocab = get_dataloaders(batch_size=64, num_workers=4)
     vocab_size = len(vocab.word2idx)
-    num_epoch = 10
+    num_epoch = 25
     base_lr = 1e-5
     pad_idx = vocab.word2idx["<PAD>"]
 

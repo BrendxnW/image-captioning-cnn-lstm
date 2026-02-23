@@ -9,16 +9,17 @@ from src.utils.text import build_vocab_from_csv
 from src.utils.text import save_vocab, load_vocab
 
 
-if os.path.exists("vocab.pkl"):
-    vocab = load_vocab("vocab.pkl")
+if os.path.exists("vocab_2.pkl"):
+    vocab = load_vocab("vocab_2.pkl")
 else:
     train8 = pd.read_csv("data/flickr8k/Train/train.csv")
     train30 = pd.read_csv("data/flickr30k/Train/train.csv")
-    train_all = pd.concat([train8, train30], ignore_index=True)
+    traincoco = pd.read_csv("data/COCO/Train/coco_train.csv")
+    train_all = pd.concat([train8, train30, traincoco], ignore_index=True)
     train_all.to_csv("data/train_combined.csv", index=False)
 
     vocab = build_vocab_from_csv("data/train_combined.csv", threshold=2)
-    save_vocab(vocab, "vocab.pkl")
+    save_vocab(vocab, "vocab_2.pkl")
 
 def caption_collate_fn(batch):
     """
@@ -125,14 +126,14 @@ def get_dataloaders(batch_size=64, num_workers=2):
 
     training_data_coco = FlickrDataset(
         csv_file="data/COCO/Train/coco_train.csv",
-        root_dir="data/COCO/Train/train2014/",
+        root_dir="data/COCO/Train/Images/",
         vocab=vocab,
         transform=train_transform
     )
 
     val_data_coco = FlickrDataset(
-        csv_file="data/COCO/Val/coco_val.csv",
-        root_dir="data/COCO/Val/val2017/",
+        csv_file="data/COCO/Validate/coco_val.csv",
+        root_dir="data/COCO/Validate/Images/",
         vocab=vocab,
         transform=eval_transform
     )
