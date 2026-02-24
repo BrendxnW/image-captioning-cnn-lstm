@@ -126,7 +126,7 @@ def get_dataloaders(batch_size=64, num_workers=2):
 
     training_data_coco = FlickrDataset(
         csv_file="data/COCO/Train/coco_train.csv",
-        root_dir="data/COCO/Train/Images/",
+        root_dir="data/COCO/Train/Images/train2014/",
         vocab=vocab,
         transform=train_transform
     )

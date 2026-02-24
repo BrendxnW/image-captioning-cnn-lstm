@@ -307,7 +307,7 @@ def main():
     group.add_argument("--vocab_pkl", type=str, help="Pickle file with saved vocab (recommended)")
     args = parser.parse_args()
 
-    vocab = load_vocab("vocab.pkl")
+    vocab = load_vocab("vocab_2.pkl")
     vocab_size = len(vocab.word2idx)
 
     pad_idx = vocab.word2idx["<PAD>"]
