@@ -22,7 +22,7 @@ def load_once():
         return _model, _vocab
     
     vocab = load_vocab(VOCAB_PTH)
-    pad_idx = _vocab.word2idx["<PAD>"]
+    pad_idx = vocab.word2idx["<PAD>"]
 
     model = build_model(len(vocab.word2idx), pad_idx).to(DEVICE)
     model.load_state_dict(torch.load(CKPT_PTH, map_location=DEVICE))
