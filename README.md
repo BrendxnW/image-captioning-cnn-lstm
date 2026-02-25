@@ -19,7 +19,6 @@
 - [Install](#install)
 - [Usage](#usage)
 - [API](#api)
-- [Contributing](#contributing)
 - [License](#license)
 
 
@@ -45,16 +44,12 @@ python -m src.training.train
 ```bash
 python -m src.scripts.generate_caption \
   --image data/Images/[your_image.jpg] \
-  --ckpt src/checkpoint/best.pt \
-  --captions_csv data/captions.csv
 ```
 *NOTE:* Change '[your_image.jpg]' to the name of your .jpg file without the brackets.  
 **Example**
 ```bash
 python -m src.scripts.generate_caption \
   --image data/Images/10815824_2997e03d76.jpg \
-  --ckpt src/checkpoint/best.pt \
-  --captions_csv data/captions.csv
 ```
 **Output**  
 ```bash
@@ -114,12 +109,6 @@ Generates a caption for a single image using a trained captioning model.
 def generate_caption(model, image, vocab, max_len=30):
 ...
 ```
-
-## Contributing
-Contributions are welcome!
-1. Fork the repo
-2. Create a feature branch
-3. Submit a PR with a clear description
 
 ## License
 [MIT © Richard McRichface.](./LICENSE)
