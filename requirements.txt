@@ -12,4 +12,6 @@ PyYAML
 joblib
 kagglehub
 kagglesdk
-
+fastapi
+pydantic
+uvicorn[standard]

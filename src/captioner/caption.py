@@ -11,10 +11,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _model = None
 _vocab = None
 
-def _load_once(ckpt_path="best_v6_finetune.pt"):
+def _load_once(ckpt_path="src/checkpoint/best_v7_retrain.pt"):
     global _model, _vocab
     if _model is None:
-        _vocab = load_vocab("vocab.pkl")
+        _vocab = load_vocab("vocab_2.pkl")
 
         vocab_size = len(_vocab.word2idx)
         pad_idx = _vocab.word2idx["<PAD>"]
@@ -28,7 +28,7 @@ def _load_once(ckpt_path="best_v6_finetune.pt"):
         model.eval().to(device)
         _model = model
 
-def caption_image(image_path: str, ckpt_path="best_v6_finetune.pt") -> str:
+def caption_image(image_path, ckpt_path="src/checkpoint/best_v7_retrain.pt"):
     _load_once(ckpt_path)
 
     train_loader, test_loader, val_loader, _ = get_dataloaders()

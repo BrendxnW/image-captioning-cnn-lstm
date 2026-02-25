@@ -125,7 +125,7 @@ def main():
     Creates the device, builds dataloaders, constructs a ResNet-based encoder,
     initializes the PhotoCaptioner model, and trains for a fixed number of epochs.
     """
-    MODEL = "best_v7_retrain.pt"
+    MODEL = "src/checkpoint/best_v7_retrain.pt"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--finetune", action="store_true")

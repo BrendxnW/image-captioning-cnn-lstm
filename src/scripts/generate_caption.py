@@ -19,9 +19,13 @@ EOS = "<EOS>"
 
 def load_image(image_path):
     """
-    Docstring for load_image
+    Loads the image
     
-    :param image_path: Description
+    Args:
+    image_path (str) - Needs the direct path to the image
+
+    Returns:
+    Transformed image
     """
     transform = T.Compose([
         T.Resize((224, 224)),
@@ -37,8 +41,12 @@ def load_image(image_path):
 def apply_repetition_penalty(logits, generated_ids, penalty=1.2):
     """
     Penalize tokens that have already appeared.
+    
+    Args:
     logits: (vocab_size,)
     generated_ids: list[int]
+
+    Returns:
     """
     if penalty is None or penalty <= 1.0 or len(generated_ids) == 0:
         return logits
@@ -300,14 +308,11 @@ def build_model(vocab_size, pad_idx):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", type=str, required=True, help="Path to image")
-    parser.add_argument("--ckpt", type=str, default="best.pt", help="Path to model checkpoint")
-
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--captions_csv", type=str, help="CSV used to build vocab (training-time)")
-    group.add_argument("--vocab_pkl", type=str, help="Pickle file with saved vocab (recommended)")
+    parser.add_argument("--ckpt", type=str, default="src/checkpoint/best_v7_retrain.pt")
+    parser.add_argument("--vocab_pkl", type=str, default="vocab_2.pkl")
     args = parser.parse_args()
 
-    vocab = load_vocab("vocab_2.pkl")
+    vocab = load_vocab(args.vocab_pkl)
     vocab_size = len(vocab.word2idx)
 
     pad_idx = vocab.word2idx["<PAD>"]
