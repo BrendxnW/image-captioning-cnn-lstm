@@ -1,4 +1,3 @@
-```yaml
 ---
 title: Photo Captioning Bot
 colorFrom: purple
@@ -9,8 +8,6 @@ app_port: 7860
 python_version: 3.13.7
 pinned: false
 ---
-
-```
 
 <h1 align="center">Photo Captioning Bot</h1>
 <p align="center">
