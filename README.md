@@ -1,3 +1,17 @@
+```yaml
+---
+title: Photo Captioning Bot
+colorFrom: purple
+colorTo: pink
+sdk: docker
+sdk_version: 28.3.2
+app_port: 7860
+python_version: 3.13.7
+pinned: false
+---
+
+```
+
 <h1 align="center">Photo Captioning Bot</h1>
 <p align="center">
   <strong>Offline CNN–LSTM image captioning in PyTorch</strong>
