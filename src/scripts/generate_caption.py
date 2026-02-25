@@ -152,7 +152,21 @@ def generate_caption_beam(
     no_repeat_ngram_size: int = 3,
 ):
     """
-    Generates captions us
+    Generates captions using beam search
+
+    Args:
+
+        model (nn.Module):
+        image (Tensor):
+        vocab (VocabLike):
+        beam_size (int): 
+        max_len (int): The max length of the caption
+        length_penalty (float):
+        repeition_penality (float):
+        no_repeat_ngram_size (int):
+
+    Returns:
+
     """
     device = next(model.parameters()).device
     image = image.to(device)
@@ -265,13 +279,31 @@ def generate_caption_beam(
 
 @torch.no_grad()
 def generate_caption_greedy(
-    model,
-    image,
-    vocab,
+    model: nn.Module,
+    image: Tensor,
+    vocab: VocabLike,
     max_len: int = MAX_LEN,
-    repetition_penalty=1.25,
-    no_repeat_ngram_size=3,
+    repetition_penalty: float = 1.25,
+    no_repeat_ngram_size: int = 3,
 ):
+    
+    """
+    Generates captions using greedy algorithm
+    
+    Args:
+
+        model (nn.Module):
+        image (Tensor):
+        vocab (VocabLike):
+        beam_size (int): 
+        max_len (int): The max length of the caption
+        length_penalty (float):
+        repeition_penality (float):
+        no_repeat_ngram_size (int):
+
+    Returns:
+
+    """
     device = next(model.parameters()).device
 
     # Encode image once
@@ -326,11 +358,16 @@ def generate_caption_greedy(
     return " ".join(words)
 
 
-def build_model(vocab_size, pad_idx):
+def build_model(vocab_size: int, pad_idx: int) -> nn.Module:
     """
-    Docstring for build_model
+    This function builds the model
     
-    :param vocab_size: Description
+    Args:
+        vocab_size (int):
+        pad_idx (int): The index of the word paddings
+    
+    Returns:
+        nn.Module: The model
     """
     resnet = models.resnet50(weights="IMAGENET1K_V1")
     resnet.fc = nn.Identity()

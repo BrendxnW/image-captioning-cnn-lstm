@@ -1,10 +1,11 @@
 import re
 import pandas as pd
-from collections import Counter
 import pickle
+from collections import Counter
+from typing import List
 
 
-def tokenize(text):
+def tokenize(text: str) -> str:
     """
     Tokenizes and normalizes a caption string.
 
@@ -18,6 +19,7 @@ def tokenize(text):
         list: List of lowercase words tokens extracted from input text.
     """
     return re.findall(r"\b\w+\b", text.lower())
+
 
 class Vocabulary:
     """
@@ -38,6 +40,9 @@ class Vocabulary:
                                    included in the vocabulary. Defaults to 2.
     """
     def __init__(self, tokens, threshold=2):
+        """
+        Initializes the Vocabulary class
+        """
         self.threshold = threshold
 
         self.word2idx = {"<PAD>":0, "<UNK>":1, "<SOS>":2, "<EOS>":3}
@@ -52,14 +57,32 @@ class Vocabulary:
                 self.idx2word[self.idx] = word
                 self.idx += 1
 
-    def token_to_id(self, token):
+    def token_to_id(self, token: str) -> int:
+        """
+        Assigns a token to an integer
+
+        Args:
+            token (str): a string that was tokenized from a list
+
+        Returns:
+            int: Returns an assigned integer to the string
+        """
         return self.word2idx.get(token, self.word2idx["<UNK>"])
 
-    def id_to_token(self, idx):
+    def id_to_token(self, idx: int) -> str:
+        """
+        Turns an integer to the corresponding token that was previously assigned
+
+        Args:
+            idx (int): The id number
+
+        Returns:
+            str: Returns the corresponding token from given id integer
+        """
         return self.idx2word.get(idx, "<UNK>")
     
 
-def build_vocab_from_csv(csv_path, threshold=2):
+def build_vocab_from_csv(csv_path: str, threshold: int = 2) :
     """
     Docstring for build_vocab_from_csv
     
@@ -79,10 +102,31 @@ def build_vocab_from_csv(csv_path, threshold=2):
 
     return Vocabulary(all_tokens, threshold=threshold)
 
-def save_vocab(vocab, path="vocab_2.pkl"):
+
+def save_vocab(vocab: List[str], path="vocab_2.pkl") -> pickle:
+    """
+    Saves a list of vocabulary into a .pkl file
+
+    Args:
+        vocab List[str]: A list of vocabluary strings
+        path (str): the path of where to save the .pkl file
+
+    Returns:
+        pickle: Saved .pkl file
+    """
     with open(path, "wb") as f:
         pickle.dump(vocab, f)
 
+
 def load_vocab(path="vocab_2.pkl"):
+    """
+    Loads in the .pkl file
+
+    Args:
+        path (str): the path of where the saved .pkl file is
+
+    Returns:
+        pickle: loaded .pkl file
+    """
     with open(path, "rb") as f:
         return pickle.load(f)

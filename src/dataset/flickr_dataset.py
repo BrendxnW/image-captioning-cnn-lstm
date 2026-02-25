@@ -7,7 +7,7 @@ from pathlib import Path
 from src.utils.text import tokenize, Vocabulary
 from typing import Tuple
 from jaxtyping import Float, Int
-from torch import Torch
+from torch import Tensor
 
 
 class FlickrDataset(Dataset):

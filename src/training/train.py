@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 import argparse
 from src.utils.data_loader import get_dataloaders
 from src.model.photo_captioner import PhotoCaptioner
+from torch.utils.data import DataLoader
+from typing import Tuple
 
 
-def train_one_epoch(model, loader, optimizer, device, pad_idx=0):
+def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: torch.optim.Optimizer, device: torch.device, pad_idx: int = 0) -> Tuple[(float, float)]:
     """
     Trains the model for a single epoch for training dataset.
 
@@ -22,7 +24,10 @@ def train_one_epoch(model, loader, optimizer, device, pad_idx=0):
                              Captions are expected to be padded token index tensors.
         optimizer (torch.optim.Optimizer): Optimizer used to update model parameters.
         device (torch.device): Device to run training on (CPU or CUDA).
-        pad_idx (optional): ignores the pad
+        pad_idx (int): ignores the pad
+
+    Returns:
+        Tuple[float, float]: A tuple that contains the average training loss and the training token accuracy
     """
     model.train()
     loss_function = nn.CrossEntropyLoss(ignore_index=pad_idx, label_smoothing=0.05)
@@ -68,7 +73,7 @@ def train_one_epoch(model, loader, optimizer, device, pad_idx=0):
     return avg_loss, token_acc
 
 
-def evaluate(model, loader, device, pad_idx=0):
+def evaluate(model: nn.Module, loader: DataLoader, device: torch.device, pad_idx: int = 0) -> Tuple[(float, float)]:
     """
     Trains the model for a single epoch for test/validation dataset.
 
@@ -81,7 +86,10 @@ def evaluate(model, loader, device, pad_idx=0):
                              Captions are expected to be padded token index tensors.
         optimizer (torch.optim.Optimizer): Optimizer used to update model parameters.
         device (torch.device): Device to run training on (CPU or CUDA).
-        pad_idx (optional): ignores the pad
+        pad_idx (int): ignores the pad
+
+    Returns:
+        Tuple[float, float]: A tuple that contains the average validation loss and validation token
     """
     model.eval()
     loss_function = nn.CrossEntropyLoss(ignore_index=0)
@@ -118,12 +126,18 @@ def evaluate(model, loader, device, pad_idx=0):
     
     return avg_loss, token_acc
 
-def main():
+def main() -> None:
     """
     Entry point for training the image captioning model.
 
     Creates the device, builds dataloaders, constructs a ResNet-based encoder,
     initializes the PhotoCaptioner model, and trains for a fixed number of epochs.
+
+    Args:
+        None
+    
+    Returns:
+        None
     """
     MODEL = "src/checkpoint/best_v7_retrain.pt"
 

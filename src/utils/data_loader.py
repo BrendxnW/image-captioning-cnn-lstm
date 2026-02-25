@@ -7,6 +7,9 @@ from torch.nn.utils.rnn import pad_sequence
 from src.dataset.flickr_dataset import FlickrDataset
 from src.utils.text import build_vocab_from_csv
 from src.utils.text import save_vocab, load_vocab
+from typing import Tuple, List
+from jaxtyping import Float, Int
+from torch import Tensor
 
 
 if os.path.exists("vocab_2.pkl"):
@@ -21,7 +24,8 @@ else:
     vocab = build_vocab_from_csv("data/train_combined.csv", threshold=2)
     save_vocab(vocab, "vocab_2.pkl")
 
-def caption_collate_fn(batch):
+
+def caption_collate_fn(batch) -> Tuple[Int[Tensor, "t", Float[Tensor, "c h w"]]]:
     """
     Custom collate function for batching image-caption pairs.
 
@@ -35,9 +39,7 @@ def caption_collate_fn(batch):
             - caption (Tensor): 1d tensor that consists tokenized caption
 
     Returns:
-        tuple:
-            - images: Batched image tensor
-            - captions: Padded caption tensor
+        Tuple[Int[Tensor, "t", Float[Tensor, "c h w"]]]: A tuple that contains the image tensor and caption tesnor
     """
     images, captions = zip(*batch)
     images = torch.stack(images)
@@ -51,7 +53,7 @@ def caption_collate_fn(batch):
     return images, captions
 
 
-def get_dataloaders(batch_size=64, num_workers=2):
+def get_dataloaders(batch_size: int = 64, num_workers: int = 2) -> Tuple[DataLoader, DataLoader, DataLoader, List[str]]:
     """
     Creates DataLoaders for the Flickr8k training and test datasets.
 
@@ -62,9 +64,13 @@ def get_dataloaders(batch_size=64, num_workers=2):
     Args:
         batch_size (int): Number of samples per batch. Defaults to 64.
         num_workers (int): Number of subprocesses used for data loading.
-        threshold (int):
+
+    Returns:
+        Tuple[DataLoader, DataLoader, DataLoader, List[str]]: A tuple that contains the data loader for training, 
+                validation, and test and a list of the vocabulary tokens.
     """
 
+    # Alters image and preprocesses for training and validation
     train_transform = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         transforms.RandomHorizontalFlip(p=0.5),
@@ -82,6 +88,7 @@ def get_dataloaders(batch_size=64, num_workers=2):
                         std=[0.229, 0.224, 0.225])
     ])
 
+    # Data loaders for Flickr8k 
     training_data_8k = FlickrDataset(
         csv_file="data/flickr8k/Train/train.csv",
         root_dir="data/flickr8k/Images/Images/",
@@ -103,6 +110,7 @@ def get_dataloaders(batch_size=64, num_workers=2):
         transform=eval_transform
     )
 
+    # Data loaders for Flickr30k 
     training_data_30k = FlickrDataset(
         csv_file="data/flickr30k/Train/train.csv",
         root_dir="data/flickr30k/Images/",
@@ -124,6 +132,7 @@ def get_dataloaders(batch_size=64, num_workers=2):
         transform=eval_transform
     )
 
+    # Data loaders for COCO 
     training_data_coco = FlickrDataset(
         csv_file="data/COCO/Train/coco_train.csv",
         root_dir="data/COCO/Train/Images/train2014/",
@@ -138,10 +147,12 @@ def get_dataloaders(batch_size=64, num_workers=2):
         transform=eval_transform
     )
 
+    # Concatanates all three datasets
     train_ds = ConcatDataset([training_data_8k, training_data_30k, training_data_coco])
     val_ds = ConcatDataset([val_data_8k, val_data_30k, val_data_coco])
     test_ds = ConcatDataset([test_data_8k, test_data_30k])
 
+    # Combined data loaders
     train_loader = torch.utils.data.DataLoader(
         train_ds,
         batch_size=batch_size,
