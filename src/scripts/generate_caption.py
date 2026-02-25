@@ -1,14 +1,25 @@
 import argparse
 import torch
-from PIL import Image
-import torchvision.transforms as T
-from src.model.photo_captioner import PhotoCaptioner
-from src.utils.text import build_vocab_from_csv 
-from torchvision import models
 import torch.nn as nn
-from src.utils.text import load_vocab
+import torchvision.transforms as T
 import torch.nn.functional as F
+from torchvision import models
+from torch import Tensor
+from PIL import Image
+from src.utils.text import load_vocab
+from src.model.photo_captioner import PhotoCaptioner
+#from src.utils.text import build_vocab_from_csv 
+from typing import List, Protocol
+from jaxtyping import Float
 
+
+class VocabLike(Protocol):
+    """
+    Custom typing for vocab
+    """
+    word2idx: dict[str, int]
+    def token_to_id(self, token: str) -> int: ...
+    def decode(self, ids: list[int]) -> str: ...
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,15 +28,15 @@ SOS = "<SOS>"
 EOS = "<EOS>"
 
 
-def load_image(image_path):
+def load_image(image_path: str) -> Float[Tensor, "1 3 224 224"]:
     """
-    Loads the image
-    
+    Loads and preprocesses an image for inference.
+
     Args:
-    image_path (str) - Needs the direct path to the image
+        image_path (str): Path to the image file.
 
     Returns:
-    Transformed image
+        Tensor: Batched image tensor of shape [1, 3, 224, 224].
     """
     transform = T.Compose([
         T.Resize((224, 224)),
@@ -37,28 +48,36 @@ def load_image(image_path):
     return transform(img).unsqueeze(0)
 
 
-
-def apply_repetition_penalty(logits, generated_ids, penalty=1.2):
+def apply_repetition_penalty(logits: Tensor, generated_ids: List[int], penalty:float = 1.2) -> Tensor:
     """
     Penalize tokens that have already appeared.
     
     Args:
-    logits: (vocab_size,)
-    generated_ids: list[int]
+        logits (Tensor): Logist of shape (vocab_size,)
+        generated_ids (List[int]): Token ids already generated
+        penalty (float): Penalty factor (>1.0 reduces the probability)
 
     Returns:
+        Tensor: Adjusted logist of shape (vocab_size,)
     """
     if penalty is None or penalty <= 1.0 or len(generated_ids) == 0:
         return logits
-    # Reduce logit for previously used tokens
     for tok in set(generated_ids):
         logits[tok] = logits[tok] / penalty
     return logits
 
-def ban_repeat_ngrams(logits, generated_ids, no_repeat_ngram_size=3):
+
+def ban_repeat_ngrams(logits: Tensor, generated_ids: List[int], no_repeat_ngram_size: int = 3) -> Tensor:
     """
     Prevent generating any n-gram that already appeared (like HF no_repeat_ngram).
-    logits: (vocab_size,)
+
+    Args:
+        logits (Tensor): Logist of shape (vocab_size,)
+        generated_ids (List[int]): Token ids already generated
+        no_repeat_ngram_size (int): 
+
+    Returns:
+        Tensor: adjusted logist 
     """
     n = no_repeat_ngram_size
     if n is None or n <= 1 or len(generated_ids) < n - 1:
@@ -79,9 +98,21 @@ def ban_repeat_ngrams(logits, generated_ids, no_repeat_ngram_size=3):
     return logits
 
 @torch.no_grad()
-def generate_caption(model, image, vocab, decode="beam",beam_size=3, max_len=MAX_LEN):
+def generate_caption(model: nn.Module, image: Tensor, vocab: VocabLike, decode: str = "beam", beam_size: int = 3, max_len: int = MAX_LEN) -> None:
     """
-    
+    Generates relevant caption with the given picture
+
+    Args:
+        model (nn.Module):
+        image (Tensor):
+        vocab (VocabLike):
+        decode (str): Which caption search
+        beam_size (int): 
+        max_len (int): The max length of the caption
+
+    Returns:
+        None
+
     """
     model.eval()
     device = next(model.parameters()).device
@@ -111,15 +142,18 @@ def generate_caption(model, image, vocab, decode="beam",beam_size=3, max_len=MAX
 
 @torch.no_grad()
 def generate_caption_beam(
-    model,
-    image,
-    vocab,
-    beam_size=3,
-    max_len=20,
-    length_penalty=0.9,
-    repetition_penalty=1.25,
-    no_repeat_ngram_size=3,
+    model: nn.Module,
+    image: Tensor,
+    vocab: VocabLike,
+    beam_size: int = 3,
+    max_len: int = MAX_LEN,
+    length_penalty: float = 0.9,
+    repetition_penalty: float = 1.25,
+    no_repeat_ngram_size: int = 3,
 ):
+    """
+    Generates captions us
+    """
     device = next(model.parameters()).device
     image = image.to(device)
 
@@ -234,7 +268,7 @@ def generate_caption_greedy(
     model,
     image,
     vocab,
-    max_len=20,
+    max_len: int = MAX_LEN,
     repetition_penalty=1.25,
     no_repeat_ngram_size=3,
 ):

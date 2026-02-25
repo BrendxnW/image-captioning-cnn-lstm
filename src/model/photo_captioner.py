@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch import Tensor
 
 
 class PhotoCaptioner(nn.Module):
@@ -14,7 +15,7 @@ class PhotoCaptioner(nn.Module):
         encoder (nn.Module): CNN feature extractor that outputs image features.
         vocab_size (int): Number of tokens in the vocabulary.
     """
-    def __init__(self, encoder, vocab_size, pad_idx):
+    def __init__(self, encoder: nn.Module, vocab_size: int, pad_idx: int) -> None:
         """
         Initializes the PhotoCaptioner model.
         """
@@ -31,7 +32,7 @@ class PhotoCaptioner(nn.Module):
         self.fc_out = nn.Linear(512, vocab_size)
 
 
-    def forward(self, images, captions_in):
+    def forward(self, images: Tensor, captions_in: Tensor) -> Tensor:
         """
         Forward pass for caption generation training.
 

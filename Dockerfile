@@ -2,12 +2,15 @@ FROM python:3.13.7
 
 WORKDIR /src
 
-COPY requirements.txt ./
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libjpeg62-turbo-dev zlib1g-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PYTHONUNBUFFERED=1
+EXPOSE 7860
 
-CMD ["python", "-m", "src.scripts.generate_caption"]
+CMD ["uvicorn", "captioner_api:app", "--host", "0.0.0.0", "--port", "7860"]

@@ -1,10 +1,13 @@
-from torch.utils.data import Dataset
-from PIL import Image
 import torch
 import pandas as pd
 import os
+from torch.utils.data import Dataset
+from PIL import Image
 from pathlib import Path
 from src.utils.text import tokenize, Vocabulary
+from typing import Tuple
+from jaxtyping import Float, Int
+from torch import Torch
 
 
 class FlickrDataset(Dataset):
@@ -18,9 +21,15 @@ class FlickrDataset(Dataset):
         root_dir (str): The root directory that consists all the photos
         vocab (str): The string
         transform (callable, optional): Optional transform to be applied to each image
+    
+    Returns:
+        int: Number of samples in the datasets
+        tuple:
+            - Image (tensor long): the transformed image
+            - Captions (tensor int): the corresponding caption
     """
 
-    def __init__(self, csv_file, root_dir, vocab, transform=None):
+    def __init__(self, csv_file: str, root_dir: str, vocab:str, transform=None) -> None:
         """
         Initialize the custom dataset
         """
@@ -29,16 +38,16 @@ class FlickrDataset(Dataset):
         self.vocab = vocab
         self.transform = transform
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the number of samples in dataset
         
         Returns:
-            int: Numbers of samples in the dataset
+            int: Numbers of samples in the datasets
         """
         return len(self.df)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[Float[Tensor, "c h w"], Int[Tensor, "t"]]:
         """
         Retrieves the image and caption at the given index
         
@@ -47,13 +56,12 @@ class FlickrDataset(Dataset):
 
         Returns:
             tuple:
-                - Image (tensor): the transformed image
-                - Captions (str): the corresponding caption
+                - Image (tensor long): the transformed image
+                - Captions (tensor int): the corresponding caption
         """
         img_file = str(self.df.loc[idx, "image"]).strip()
         caption = self.df.loc[idx, "caption"]
 
-        # In case CSV has "Images/xxx.jpg" or "flickr8k/Images/xxx.jpg", keep only filename
         img_file = os.path.basename(img_file)
 
         img_path = Path(self.root_dir) / img_file
