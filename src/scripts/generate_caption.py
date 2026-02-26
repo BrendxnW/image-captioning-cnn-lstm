@@ -44,7 +44,11 @@ def load_image(image_path: str) -> Float[Tensor, "1 3 224 224"]:
         T.Normalize(mean=[0.485, 0.456, 0.406],
                     std=[0.229, 0.224, 0.225])
     ])
-    img = Image.open(image_path).convert("RGB")
+
+    if isinstance(image_path, Image.Image):
+        img = image_path.convert("RGB")
+    else:
+        img = Image.open(image_path).convert("RGB")
     return transform(img).unsqueeze(0)
 
 
