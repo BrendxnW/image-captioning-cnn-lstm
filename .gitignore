@@ -213,3 +213,7 @@ graphs/
 *.pt
 
 **/tempCodeRunnerFile.py
+
+# but allow these specific ones
+!src/vocab/vocab_2.pkl
+!src/checkpoint/best_v7_retrain.pt
