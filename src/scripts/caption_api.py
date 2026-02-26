@@ -10,10 +10,10 @@ from pathlib import Path
 
 app = FastAPI()
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CKPT_PTH = BASE_DIR / "src" / "checkpoint" / "best_v7_retrain.pt"
-VOCAB_PTH = BASE_DIR / "vocab_2.pkl"
+VOCAB_PTH = BASE_DIR / "src" / "vocab" / "vocab_2.pkl"
 
 _model = None
 _vocab = None
@@ -42,3 +42,4 @@ async def caption(image: UploadFile = File(...)):
     img = Image.open(io.BytesIO(data)).convert("RGB")
     text = generate_caption(model, img, vocab, decode="beam")
     return {"caption": text}
+
