@@ -4,14 +4,16 @@ from fastapi import FastAPI, UploadFile, File
 from PIL import Image
 from src.scripts.generate_caption import generate_caption, load_image, build_model
 from src.utils.text import load_vocab
+from pathlib import Path
 
 
 
 app = FastAPI()
 
+BASE_DIR = Path(__file__).resolve().parent
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CKPT_PTH = "src/checkpoint/best_v7_retrain.pt"
-VOCAB_PTH = "vocab_2.pkl"
+CKPT_PTH = BASE_DIR / "src" / "checkpoint" / "best_v7_retrain.pt"
+VOCAB_PTH = BASE_DIR / "vocab_2.pkl"
 
 _model = None
 _vocab = None
@@ -19,7 +21,7 @@ _vocab = None
 
 def load_once():
     global _model, _vocab
-    
+
     if _model is not None and _vocab is not None:
         return _model, _vocab
 
