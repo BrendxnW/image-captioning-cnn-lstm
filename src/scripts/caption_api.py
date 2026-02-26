@@ -38,8 +38,11 @@ def load_once():
 @app.post("/caption")
 async def caption(image: UploadFile = File(...)):
     model, vocab = load_once()
-    data = await image.read()
-    img = Image.open(io.BytesIO(data)).convert("RGB")
-    text = generate_caption(model, img, vocab, decode="beam")
-    return {"caption": text}
 
+    data = await image.read()
+    pil_img = Image.open(io.BytesIO(data)).convert("RGB")
+
+    img_tensor = load_image(pil_img).unsqueeze(0).to(DEVICE)
+
+    text = generate_caption(model=model, image=img_tensor, vocab=vocab, decode="beam")
+    return {"caption": text}
