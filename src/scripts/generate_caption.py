@@ -379,16 +379,16 @@ def build_model(vocab_size: int, pad_idx: int) -> nn.Module:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", type=str, required=True, help="Path to image")
-    parser.add_argument("--ckpt", type=str, default="src/checkpoint/best_v7_retrain.pt")
-    parser.add_argument("--vocab_pkl", type=str, default="vocab_2.pkl")
+    #parser.add_argument("--ckpt", type=str, default="src/checkpoint/best_v7_retrain.pt")
+    #parser.add_argument("--vocab_pkl", type=str, default="vocab_2.pkl")
     args = parser.parse_args()
 
-    vocab = load_vocab(args.vocab_pkl)
+    vocab = load_vocab("vocab_2.pkl")
     vocab_size = len(vocab.word2idx)
 
     pad_idx = vocab.word2idx["<PAD>"]
     model = build_model(vocab_size, pad_idx).to(DEVICE)
-    model.load_state_dict(torch.load(args.ckpt, map_location=DEVICE))
+    model.load_state_dict(torch.load("src/checkpoint/best_v7_retrain.pt", map_location=DEVICE))
 
     image = load_image(args.image)
 
