@@ -380,10 +380,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", type=str, required=True, help="Path to image")
     #parser.add_argument("--ckpt", type=str, default="src/checkpoint/best_v7_retrain.pt")
-    #parser.add_argument("--vocab_pkl", type=str, default="vocab_2.pkl")
+    #parser.add_argument("--vocab_pkl", type=str, default="src/vocabvocab_2.pkl")
     args = parser.parse_args()
 
-    vocab = load_vocab("vocab_2.pkl")
+    vocab = load_vocab("src/vocab/vocab_2.pkl")
     vocab_size = len(vocab.word2idx)
 
     pad_idx = vocab.word2idx["<PAD>"]

@@ -12,8 +12,8 @@ from jaxtyping import Float, Int
 from torch import Tensor
 
 
-if os.path.exists("vocab_2.pkl"):
-    vocab = load_vocab("vocab_2.pkl")
+if os.path.exists("src/vocab/vocab_2.pkl"):
+    vocab = load_vocab("src/vocab/vocab_2.pkl")
 else:
     train8 = pd.read_csv("data/flickr8k/Train/train.csv")
     train30 = pd.read_csv("data/flickr30k/Train/train.csv")
@@ -22,7 +22,7 @@ else:
     train_all.to_csv("data/train_combined.csv", index=False)
 
     vocab = build_vocab_from_csv("data/train_combined.csv", threshold=2)
-    save_vocab(vocab, "vocab_2.pkl")
+    save_vocab(vocab, "src/vocab/vocab_2.pkl")
 
 
 def caption_collate_fn(batch) -> Tuple[Int[Tensor, "t", Float[Tensor, "c h w"]]]:

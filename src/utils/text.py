@@ -103,7 +103,7 @@ def build_vocab_from_csv(csv_path: str, threshold: int = 2) :
     return Vocabulary(all_tokens, threshold=threshold)
 
 
-def save_vocab(vocab: List[str], path="vocab_2.pkl") -> pickle:
+def save_vocab(vocab: List[str], path="src/vocab/vocab_2.pkl") -> pickle:
     """
     Saves a list of vocabulary into a .pkl file
 
@@ -118,7 +118,7 @@ def save_vocab(vocab: List[str], path="vocab_2.pkl") -> pickle:
         pickle.dump(vocab, f)
 
 
-def load_vocab(path="vocab_2.pkl"):
+def load_vocab(path="src/vocab/vocab_2.pkl"):
     """
     Loads in the .pkl file
 
