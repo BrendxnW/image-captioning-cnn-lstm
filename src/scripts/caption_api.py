@@ -42,7 +42,7 @@ async def caption(image: UploadFile = File(...)):
     data = await image.read()
     pil_img = Image.open(io.BytesIO(data)).convert("RGB")
 
-    img_tensor = load_image(pil_img).unsqueeze(0).to(DEVICE)
+    img_tensor = load_image(pil_img).to(DEVICE)
 
     text = generate_caption(model=model, image=img_tensor, vocab=vocab, decode="beam")
     return {"caption": text}
