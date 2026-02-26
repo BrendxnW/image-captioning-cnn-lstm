@@ -213,6 +213,8 @@ graphs/
 *.pt
 
 **/tempCodeRunnerFile.py
+**/tempCodeRunnerFile.python
+tall git-filter-repo
 
 # but allow these specific ones
 !src/vocab/vocab_2.pkl
