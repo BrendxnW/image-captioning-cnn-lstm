@@ -5,6 +5,7 @@ import torch.optim as optim
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
+import time
 from src.utils.data_loader import get_dataloaders
 from src.model.photo_captioner import PhotoCaptioner
 from torch.utils.data import DataLoader
@@ -36,6 +37,7 @@ def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: torch.optim
     correct = 0
     total = 0
 
+    last_print = time.time()
     for i, (images, captions) in enumerate(loader):
         images = images.to(device)
         captions = captions.to(device)
@@ -65,9 +67,11 @@ def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: torch.optim
         optimizer.step()
 
         avg_loss = total_loss / len(loader)
-        token_acc = 100.0 * correct / max(total, 1)
-        if (i + 1) % 50 == 0:
+
+        if time.time() - last_print > 30:
+            token_acc = 100.0 * correct / max(total, 1)
             print(f"Batch {i+1:5d} training loss: {loss.item():.4f} | Token acc: {token_acc:.2f}%")
+            last_print = time.time()
 
     print("Finished Training")
     return avg_loss, token_acc
@@ -139,7 +143,7 @@ def main() -> None:
     Returns:
         None
     """
-    MODEL = "src/checkpoint/best_v7_retrain.pt"
+    MODEL = "src/checkpoint/best_v8_finetune.pt"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--finetune", action="store_true")
@@ -149,9 +153,9 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using: {device}")
 
-    train_loader, test_loader, val_loader, vocab = get_dataloaders(batch_size=64, num_workers=4)
+    train_loader, test_loader, val_loader, vocab = get_dataloaders()
     vocab_size = len(vocab.word2idx)
-    num_epoch = 25
+    num_epoch = 15
     base_lr = 1e-5
     pad_idx = vocab.word2idx["<PAD>"]
 

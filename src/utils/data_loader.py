@@ -25,7 +25,7 @@ else:
     save_vocab(vocab, "src/vocab/vocab_2.pkl")
 
 
-def caption_collate_fn(batch) -> Tuple[Int[Tensor, "t", Float[Tensor, "c h w"]]]:
+def caption_collate_fn(batch):
     """
     Custom collate function for batching image-caption pairs.
 
@@ -53,7 +53,7 @@ def caption_collate_fn(batch) -> Tuple[Int[Tensor, "t", Float[Tensor, "c h w"]]]
     return images, captions
 
 
-def get_dataloaders(batch_size: int = 64, num_workers: int = 2) -> Tuple[DataLoader, DataLoader, DataLoader, List[str]]:
+def get_dataloaders(batch_size=120, num_workers=2) -> Tuple[DataLoader, DataLoader, DataLoader, List[str]]:
     """
     Creates DataLoaders for the Flickr8k training and test datasets.
 
@@ -62,7 +62,7 @@ def get_dataloaders(batch_size: int = 64, num_workers: int = 2) -> Tuple[DataLoa
     PyTorch DataLoaders for batching and iteration during training/evaluation.
 
     Args:
-        batch_size (int): Number of samples per batch. Defaults to 64.
+        batch_size (int): Number of samples per batch.
         num_workers (int): Number of subprocesses used for data loading.
 
     Returns:
