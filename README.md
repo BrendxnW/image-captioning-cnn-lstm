@@ -18,10 +18,15 @@ pinned: false
   Designed as a local, privacy-friendly baseline for multimodal learning and experimentation.
 </p>
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.13.7-blue?logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
-  <img src="https://img.shields.io/badge/license-MIT-green" />
-
+  <a href="https://www.python.org/downloads/release/python-3137/">
+      <img src="https://img.shields.io/badge/Python-3.13.7-blue?logo=python&logoColor=white" />
+  </a>
+  <a href="https://pytorch.org/">
+    <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
+  </a>
+  <a= href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green" />
+  </a>
 </p>
 
 ## Table of Contents
