@@ -20,7 +20,7 @@ pinned: false
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.13.7-blue?logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
-  <img src="https://img.shields.io/badge/Status-Educational-green" />
+  <img src="https://img.shields.io/badge/license-MIT-green" />
 
 </p>
 
