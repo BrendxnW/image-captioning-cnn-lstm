@@ -47,7 +47,7 @@ Photo captioning sits in between computer vision and natural language processing
 
 ## Install
 ```bash
-git clone https://github.com/yourname/photo-captioner.git  
+git clone https://github.com/BrendxnW/photo-captioner.git  
 cd photo-captioner
 pip install -r requirements.txt
 ```
