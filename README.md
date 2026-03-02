@@ -24,8 +24,8 @@ pinned: false
   <a href="https://pytorch.org/">
     <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
   </a>
-  <a= href="LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-green" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green" />
   </a>
 </p>
 
