@@ -12,7 +12,7 @@ app = FastAPI()
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CKPT_PTH = BASE_DIR / "src" / "checkpoint" / "best_v7_retrain.pt"
+CKPT_PTH = BASE_DIR / "src" / "checkpoint" / "best_v8_finetune.pt"
 VOCAB_PTH = BASE_DIR / "src" / "vocab" / "vocab_2.pkl"
 
 _model = None
