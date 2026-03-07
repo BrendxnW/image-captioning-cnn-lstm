@@ -3,12 +3,13 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as T
 import torch.nn.functional as F
+
+
 from torchvision import models
 from torch import Tensor
 from PIL import Image
 from src.utils.text import load_vocab
 from src.model.photo_captioner import PhotoCaptioner
-#from src.utils.text import build_vocab_from_csv 
 from typing import List, Protocol
 from jaxtyping import Float
 
@@ -392,7 +393,7 @@ def main():
 
     pad_idx = vocab.word2idx["<PAD>"]
     model = build_model(vocab_size, pad_idx).to(DEVICE)
-    model.load_state_dict(torch.load("src/checkpoint/best_v7_retrain.pt", map_location=DEVICE))
+    model.load_state_dict(torch.load("src/checkpoint/best_v8_finetune.pt", map_location=DEVICE))
 
     image = load_image(args.image)
 

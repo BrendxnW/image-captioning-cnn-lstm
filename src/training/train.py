@@ -70,7 +70,7 @@ def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: torch.optim
 
         if time.time() - last_print > 30:
             token_acc = 100.0 * correct / max(total, 1)
-            print(f"Batch {i+1:5d} training loss: {loss.item():.4f} | Token acc: {token_acc:.2f}%")
+            print(f"Batch {i+1:5d}/{len(loader)} training loss: {loss.item():.4f} | Token acc: {token_acc:.2f}%")
             last_print = time.time()
 
     print("Finished Training")
@@ -88,7 +88,6 @@ def evaluate(model: nn.Module, loader: DataLoader, device: torch.device, pad_idx
         model (nn.Module): The captioning model to train.
         loader (DataLoader): Dataloader providing (images, captions) batches. 
                              Captions are expected to be padded token index tensors.
-        optimizer (torch.optim.Optimizer): Optimizer used to update model parameters.
         device (torch.device): Device to run training on (CPU or CUDA).
         pad_idx (int): ignores the pad
 
@@ -155,7 +154,7 @@ def main() -> None:
 
     train_loader, test_loader, val_loader, vocab = get_dataloaders()
     vocab_size = len(vocab.word2idx)
-    num_epoch = 15
+    num_epoch = 20
     base_lr = 1e-5
     pad_idx = vocab.word2idx["<PAD>"]
 
@@ -187,7 +186,7 @@ def main() -> None:
     else:
         optimizer = torch.optim.AdamW(model.parameters(), lr=base_lr, weight_decay=1e-4)
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2, threshold=1e-3, threshold_mode="rel")
     best_val = float("inf")
 
     if args.finetune:
