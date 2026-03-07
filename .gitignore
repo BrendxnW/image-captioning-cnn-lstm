@@ -211,6 +211,9 @@ data/
 graphs/
 *.pkl
 *.pt
+*.png
+*.csv
+
 
 **/tempCodeRunnerFile.py
 **/tempCodeRunnerFile.python
@@ -218,4 +221,4 @@ tall git-filter-repo
 
 # but allow these specific ones
 !src/vocab/vocab_2.pkl
-!src/checkpoint/best_v7_retrain.pt
+!src/checkpoint/best_v8_retrain.pt

@@ -44,5 +44,5 @@ async def caption(image: UploadFile = File(...)):
 
     img_tensor = load_image(pil_img).to(DEVICE)
 
-    text = generate_caption(model=model, image=img_tensor, vocab=vocab, decode="beam")
+    text = generate_caption(model=model, image=img_tensor, vocab=vocab, decode="greedy")
     return {"caption": text}
