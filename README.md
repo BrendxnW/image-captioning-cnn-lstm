@@ -18,8 +18,8 @@ pinned: false
   Designed as a local, privacy-friendly baseline for multimodal learning and experimentation.
 </p>
 <p align="center">
-  <a href="https://www.python.org/downloads/release/python-3137/">
-      <img src="https://img.shields.io/badge/Python-3.13.7-blue?logo=python&logoColor=white" />
+  <a href="https://www.python.org/downloads/">
+      <img src="https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white" />
   </a>
   <a href="https://pytorch.org/">
     <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
@@ -111,6 +111,8 @@ python -m src.scripts.generate_caption \
   --image data/Images/[your_image.jpg] \
 ```
 *NOTE:* Change '[your_image.jpg]' to the name of your .jpg file without the brackets.  
+
+
 **Example**
 ```bash
 python -m src.scripts.generate_caption \
@@ -122,13 +124,14 @@ Caption: a man in a red shirt is standing in front of a large crowd
 ```
 
 ## API
-### POST /generate_caption
+**POST /generate_caption**
+
 Generate a caption for an uploaded image.
 
-### Request
+**Request**
 - image: an image file
 
-### Response
+**Response**
 ```json
 {
   "image": data/Images/10815824_2997e03d76.jpg
@@ -137,16 +140,24 @@ Generate a caption for an uploaded image.
 ```
 
 ## Model Details
-### Architecture:
+**Architecture:**
 - Encoder: ResNet50
 - Decoder: LSTM
-### Framework:
-PyTorch
-### Datasets:
+
+  
+**Framework:**
+- PyTorch
+
+
+**Datasets:**
 - flickr8k
 - flickr30k
 - COCO
-### Vocabulary:  
+
+  
+**Vocabulary:**
+
+
 A vocabulary was constructed from the training captions, including special tokens:
 - '<SOS\>' - Start of sequence
 - '<EOS\>' - End of sequence
