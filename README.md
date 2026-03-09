@@ -24,6 +24,9 @@ pinned: false
   <a href="https://pytorch.org/">
     <img src="https://img.shields.io/badge/PyTorch-2.10-orange?logo=pytorch&logoColor=white" />
   </a>
+  <a href="https://pytorch.org/">
+    <img src="https://img.shields.io/badge/Docker-containerized-blue?logo=Docker&logoColor=white" />
+  </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green" />
   </a>
@@ -32,11 +35,15 @@ pinned: false
 ## Table of Contents
 - [Security](#security)
 - [Background](#background)
+- [Demo Video](#demo-video)
+- [Project Structure](#project-structure)
 - [Install](#install)
 - [Usage](#usage)
 - [API](#api)
+- [Model Details](#model-details)
+- [Testing](#testing)
+- [Deployment](#deployment)
 - [License](#license)
-
 
 ## Security
 This project is designed to run fully locally and doesnt uplaod images or captions to external servers to protect user data. All photo processing and caption generation happens on the user's machine to minimize privacy risks. Since the tool will operate on unencrypted local backups or personal photo directiores, users should ensure that sensitive data is handled securiy and the generated outputs are stored appropriately. This project is inteded for research and educational use.
@@ -44,6 +51,39 @@ This project is designed to run fully locally and doesnt uplaod images or captio
 
 ## Background
 Photo captioning sits in between computer vision and natural language processing where it enables machines to translate visual content into human readable text. While there are many solutions that exist, they rely on cloud APIs and closed systems, this project focuses on building a fully local CNN-LSTM captioning pipleine in PyTorch so users can keep their data private.
+
+## Demo Video
+[Filler]
+[Link Filler]
+
+## Project Structure
+```text
+photo-captioning/
+|____src/
+    |____models/
+        |____photo_captioner.py
+    |____scripts/
+        |____caption_api.py
+        |____generate_caption.py
+    |____test/
+        |____test_output.py
+    |____training/
+        |____train.py
+    |____utils/
+        |____convert_coco_csv.py
+        |____data_loader.py
+        |____split_data.py
+        |____text.py
+|____.dockerignore
+|____.gitattributes
+|____.gitignore
+|____DockerFile
+|____LICENSE
+|____README.md
+|____requirements.txt
+
+```
+
 
 ## Install
 ```bash
@@ -73,58 +113,47 @@ Caption: a man in a red shirt is standing in front of a large crowd
 ```
 
 ## API
-### Model
-#### `PhotoCaptioner`
-**Location:** `src/model/photo_captioning.py`
+### POST /generate_caption
+Generate a caption for an uploaded image.
 
-**Description:**  
-Image captioning model that combines a CNN encoder with an LSTM decoder. The encoder extracts visual features from an image, which are projected into the embedding space and used by the decoder to generate a caption token by token.
+### Request
+- image: an image file
 
-**Constructor:**
-```python
-PhotoCaptioner(encoder, vocab_size, finetune_encoder=False)
-...
+### Response
+```json
+{
+  "caption": "a dog running through a grassy field",
+}
 ```
 
-### Data Loading
+## Model Details
+### Architecture:
+- Encoder: ResNet50
+- Decoder: LSTM
+### Framework:
+PyTorch
+### Datasets:
+- flickr8k
+- flickr30k
+- COCO
+### Vocabulary:  
+A vocabulary was constructed from the training captions, including special tokens:
+- '<SOS\>' - Start of sequence
+- '<EOS\>' - End of sequence
+- '<PAD\>' - Padding token
+- '<UNK\>' - Unkown token
 
-#### `get_dataloaders(...)`
-**Location:** `src/utils/data_loader.py`
+ 
+## Testing
 
-**Description:**  
-Creates PyTorch DataLoaders for the Flickr8k training, validation, and test splits, including image preprocessing and caption tokenization.
+Run tests with:
+```bash
 
-**Function:**
-```python
-def get_dataloaders(batch_size=64, num_workers=2):
-...
 ```
-### Training
-#### `train_one_epoch(...)`
-**Location:** `src/training/train.py`
 
-**Description:**  
-Runs a single training epoch over a dataloader and updates model parameters.
+## Deployment
 
-**Function:**
-```python
-def train_one_epoch(model, loader, optimizer, device, pad_idx=0):
-...
-```
-
-### Caption Generation
-
-#### `generate_caption(...)`
-**Location:** `src/scripts/generate_caption.py`
-
-**Description:**  
-Generates a caption for a single image using a trained captioning model.
-
-**Function:**
-```python
-def generate_caption(model, image, vocab, max_len=30):
-...
-```
+Backend: <a href="https://huggingface.co/spaces/BrendxnW/photo-captioner">HuggingFace</a>
 
 ## License
 [MIT © Richard McRichface.](./LICENSE)
