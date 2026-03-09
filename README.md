@@ -89,6 +89,15 @@ photo-captioning/
 ```bash
 git clone https://github.com/BrendxnW/photo-captioner.git  
 cd photo-captioner
+
+# Windows
+python -m venv venv
+source venv/Scripts/activate
+
+# Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 ## Usage
@@ -122,7 +131,8 @@ Generate a caption for an uploaded image.
 ### Response
 ```json
 {
-  "caption": "a dog running through a grassy field",
+  "image": data/Images/10815824_2997e03d76.jpg
+  "caption": "a man in a red shirt is standing in front of a large crowd",
 }
 ```
 
