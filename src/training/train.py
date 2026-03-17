@@ -238,7 +238,7 @@ def main() -> None:
     plt.savefig("loss_curve.png", dpi=200)
     plt.show()
 
-    # plot accuracy curve (optional)
+    # plot accuracy curve
     plt.figure()
     plt.plot(metrics["epoch"], metrics["train_token_acc"], label="Train Token Acc")
     plt.plot(metrics["epoch"], metrics["val_token_acc"], label="Val Token Acc")
